@@ -97,3 +97,21 @@ jobs:
             DEB_MIRROR=deb.debian.org
             VERSION=${{ steps.meta.outputs.version }}
           cache-from: type=gha
+
+      # Prove that every tag really landed in the registry and that they all point to the same image.
+      - name: Verify published tags
+        if: github.event_name != 'pull_request'
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          set -eu
+          first=""
+          while IFS= read -r t; do
+            [ -n "$t" ] || continue
+            d="$(docker buildx imagetools inspect "$t" --format '{{.Manifest.Digest}}')"
+            echo "::notice title=published tag::$t -> $d"
+            echo "- \`$t\` → \`$d\`" >> "$GITHUB_STEP_SUMMARY"
+            if [ -z "$first" ]; then first="$d"; elif [ "$d" != "$first" ]; then
+              echo "::error::tag $t has a different digest ($d) than the first tag ($first)"; exit 1
+            fi
+          done <<< "$TAGS"
