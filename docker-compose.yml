@@ -1,0 +1,25 @@
+services:
+  idrac:
+    # Local build from this checkout (see scripts/local.sh). For the prebuilt image use `docker run`, see README.
+    image: idrac6-viewer:local
+    build:
+      context: .
+      args:
+        DEB_MIRROR: ${DEB_MIRROR:-mirror.yandex.ru}   # chosen by scripts/local.sh (fastest mirror)
+        VERSION: local
+    platform: linux/amd64
+    init: true
+    stdin_open: true   # needed for the interactive password prompt
+    tty: true
+    environment:
+      IDRAC_HOST: ${IDRAC_HOST:-}
+      IDRAC_USER: ${IDRAC_USER:-root}
+      IDRAC_HTTPS_PORT: ${IDRAC_HTTPS_PORT:-443}
+      IDRAC_KVM_PORT: ${IDRAC_KVM_PORT:-5900}
+      IDRAC_PASSWORD: ${IDRAC_PASSWORD:-}
+      RESOLUTION: ${RESOLUTION:-1280x800x24}
+      JAVA_OPTS: ${JAVA_OPTS:--Xmx256m}
+    ports:
+      - "127.0.0.1:6080:6080"   # noVNC, this machine only (there is no VNC authentication!)
+    volumes:
+      - "${ISO_DIR:-./iso}:/iso:ro"   # folder with ISO images for Virtual Media

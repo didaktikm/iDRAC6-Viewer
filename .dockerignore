@@ -1,0 +1,9 @@
+.git
+.github
+.env
+.mirror
+iso
+work
+*.zip
+README*.md
+docs

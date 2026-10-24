@@ -1,0 +1,5 @@
+.env
+.mirror
+iso/*
+!iso/.gitkeep
+work/
