@@ -45,7 +45,9 @@ RESOLUTION="${RESOLUTION:-1280x800x24}"
 JAVA_OPTS="${JAVA_OPTS:--Xmx256m}"
 SELFTEST=0
 
-need_value() { [ "$#" -ge 2 ] && [ -n "$2" ] || { log "Option $1 needs a value"; exit 2; }; }
+need_value() {
+  if [ "$#" -lt 2 ] || [ -z "$2" ]; then log "Option $1 needs a value"; exit 2; fi
+}
 
 while [ $# -gt 0 ]; do
   case "$1" in
